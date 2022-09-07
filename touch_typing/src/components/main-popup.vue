@@ -1,9 +1,9 @@
 <template>
     <div class="main-popup">
         <div class="main-popup__left-column">
-            <textarea class="main-popup__text-field">
-                p[] ghbdtn rfr ltkf xnj ltkftim hahahahaha vexla
-            </textarea>
+            <div class="main-popup__text-field">
+                <span class="main-popup__completed">p[] ghbdtn rfr ltkf xnj ltkftim hahahahah</span><span class="main-popup__selected">a</span><span class="main-popup__empty"> vexla</span>
+            </div>
         </div>
 
         <div class="main-popup__rigth-column">
@@ -37,6 +37,10 @@ export default {
         return {
 
         }
+    },
+
+    methods: {
+        
     }
 }
 </script>
