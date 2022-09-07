@@ -5,6 +5,7 @@
 @color-white: #fff;
 @color-dark-blue: rgb(42, 99, 110);
 @color-gray: rgb(100, 100, 100);
+@color-red: rgb(230, 0, 0);
 
 * {
     font-family: 'Roboto', sans-serif;
@@ -41,22 +42,30 @@
         font-size: 22px;
         line-height: 1.2;
         font-weight: 500;
+        white-space: normal;
     }
 
     &__completed {
         color: @color-blue;
+        white-space: normal;
     }
 
     &__selected {
         border-radius: 3px;
         display: inline-block;
         padding: 0 3px;
+
         color: @color-white;
         background: @color-blue;
     }
 
+    &__selected-error {
+        background: @color-red;
+    }
+
     &__empty {
         color: @color-light-blue;
+        white-space: normal;
     }
 
     &__rigth-column {
@@ -155,4 +164,9 @@
 ._btn-active {
     background: @color-blue;
     color: @color-white;
+}
+
+._spaceSymbol {
+    margin-bottom: -5px;
+    padding: 12px 5px;
 }
