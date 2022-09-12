@@ -72,9 +72,9 @@ export default {
             ],
 
             enteredValue: 0,
+            timer: 0,
 
             pieceFullText: 0,
-
 
             speedInterval: null,
             roundInterval: null,
@@ -147,7 +147,7 @@ export default {
             }
         },
 
-        letterSlice() {
+        newLetterSlice() {
             this.completed = '';
             this.selected = this.originalText[0];
             this.originalText = this.originalText.slice(1);
@@ -159,7 +159,7 @@ export default {
 
             this.pieceFullText = (100 / this.originalText.length).toFixed(1);
             
-            this.letterSlice();
+            this.newLetterSlice();
         },
 
         defineLanguage(value) {
@@ -178,15 +178,14 @@ export default {
 
         speedometer() {
             let piece = 1 / 60;
-            let timer = 0;
 
             function speed() {
-                timer += piece;
-                this.stats[0].value = Math.floor(this.enteredValue / timer) + 'зн/м';
+                this.timer += piece;
+                this.stats[0].value = Math.floor(this.enteredValue / this.timer) + 'зн/м';
             }
 
             function roundMin() {
-                timer = Math.ceil(timer);
+                this.timer = Math.ceil(this.timer);
             }
 
             this.speedInterval = setInterval(speed.bind(this) , 1000);
@@ -212,11 +211,13 @@ export default {
         startExercisingAgain() {
             this.originalText = this.completed + this.selected + this.originalText;
 
-            this.letterSlice();
+            this.newLetterSlice();
 
             this.stats[0].value = '0зн/м';
             this.stats[1].value = '100%';
-
+            
+            this.enteredValue = 0;
+            this.timer = 0;
             clearInterval(this.speedInterval);
             clearInterval(this.roundInterval);
         }
