@@ -22,7 +22,9 @@
                 :stat="stat"
             class="mt-left-item"></statistic>
 
-            <again class="mt-left-item"></again>
+            <again
+                @again="startExercisingAgain"
+            class="mt-left-item"></again>
 
             <difficulty class="mt-left-item"></difficulty>
         </div>
@@ -72,6 +74,10 @@ export default {
             enteredValue: 0,
 
             pieceFullText: 0,
+
+
+            speedInterval: null,
+            roundInterval: null,
         }
     },
 
@@ -141,15 +147,19 @@ export default {
             }
         },
 
+        letterSlice() {
+            this.completed = '';
+            this.selected = this.originalText[0];
+            this.originalText = this.originalText.slice(1);
+        },
+
         async updateOriginalText(lang) {
             let loremTextObj = new LoremText(lang);
             this.originalText = await loremTextObj.getLoremText(4); 
 
             this.pieceFullText = (100 / this.originalText.length).toFixed(1);
             
-            this.completed = '';
-            this.selected = this.originalText[0];
-            this.originalText = this.originalText.slice(1);
+            this.letterSlice();
         },
 
         defineLanguage(value) {
@@ -175,10 +185,12 @@ export default {
                 this.stats[0].value = Math.floor(this.enteredValue / timer) + 'зн/м';
             }
 
-            setInterval(speed.bind(this) , 1000);
-            setInterval(() => {
+            function roundMin() {
                 timer = Math.ceil(timer);
-            }, 60000);
+            }
+
+            this.speedInterval = setInterval(speed.bind(this) , 1000);
+            this.roundInterval = setInterval(roundMin, 60000);
         },
 
         accuracyCheck() {
@@ -195,6 +207,19 @@ export default {
 
             this.stats[1].value = (valueAccuracy - this.pieceFullText).toFixed(1) + '%';
         },
+
+
+        startExercisingAgain() {
+            this.originalText = this.completed + this.selected + this.originalText;
+
+            this.letterSlice();
+
+            this.stats[0].value = '0зн/м';
+            this.stats[1].value = '100%';
+
+            clearInterval(this.speedInterval);
+            clearInterval(this.roundInterval);
+        }
 
     }
 }
