@@ -16,5 +16,5 @@ export default {
 }
 </script>
 
-<style src="../less/index.less" lang="less">
+<style src="./less/index.less" lang="less">
 </style>

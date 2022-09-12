@@ -1,15 +1,15 @@
 <template>
     <div class="statistic">
         <p class="statistic__title">
-            title:
+            {{stat.title}}:
         </p>
 
         <div class="statistic__wrapper-stat">
             <p class="statistic__value">
-                300m/s
+                {{stat.value}}
             </p>
             <p class="statistic__max-stat">
-                600m/s <span>max</span>
+                {{stat.maxValue}} <span>max</span>
             </p>
         </div>
     </div>
@@ -17,6 +17,10 @@
 
 <script>
 export default {
+    props: {
+        stat: Object,
+    },
+    
     name: 'statistic',
 }
 </script>
