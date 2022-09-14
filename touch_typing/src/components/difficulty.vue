@@ -33,6 +33,12 @@ export default {
     methods: {
         changeMode(mode) {
             this.hardMode = mode;
+
+            if (mode) {
+                this.$emit('changeMode', 'hard');
+            } else {
+                this.$emit('changeMode', 'easy');
+            }
         }
     }
 
