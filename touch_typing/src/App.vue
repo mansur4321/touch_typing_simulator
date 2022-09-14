@@ -43,7 +43,6 @@ export default {
   methods: {
     completedGame(fullStats) {
       this.fullStats = fullStats.slice(0);
-
       this.completePopup = true;
     },
 

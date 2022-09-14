@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import LocalStorageAPI from '../API/localStorageAPI';
 import LoremText from '../API/lorem_text'
 
 import Again from './again.vue'
@@ -54,6 +55,8 @@ export default {
 
     data() {
         return {
+            myStorage: new LocalStorageAPI(),
+
             lang: 'rus',
             numberOfSentences: 2,
 
@@ -183,7 +186,11 @@ export default {
 
         async updateOriginalText(lang) {
             let loremTextObj = new LoremText(lang);
-            this.originalText = await loremTextObj.getLoremText(this.correctAmount(this.numberOfSentences, lang)); 
+            let maxValues = this.myStorage.getValues();
+
+            this.originalText = await loremTextObj.getLoremText(this.correctAmount(1, lang));
+            this.stats[0].maxValue = maxValues.speed;
+            this.stats[1].maxValue = maxValues.accuracy;
 
             this.pieceFullText = (100 / this.originalText.length).toFixed(1);
             
