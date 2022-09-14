@@ -22,9 +22,13 @@
                 :stat="stat"
             class="mt-left-item"></statistic>
 
-            <again class="mt-left-item"></again>
+            <again
+                @again="startExercisingAgain"
+            class="mt-left-item"></again>
 
-            <difficulty class="mt-left-item"></difficulty>
+            <difficulty
+                @changeMode="changeMode"
+            class="mt-left-item"></difficulty>
         </div>
     </div>
 </template>
@@ -37,6 +41,10 @@ import Difficulty from './difficulty.vue'
 import statistic from './statistic.vue'
 
 export default {
+    props: {
+        againMark: Boolean,
+    },
+
     components: { 
         statistic,
         Again,
@@ -47,35 +55,40 @@ export default {
     data() {
         return {
             lang: 'rus',
+            numberOfSentences: 2,
 
             errorInput: false,
             spaceSymbol: false,
 
             completed: '',
             selected: '',
-            originalText: 'lorems sssssssss sssss ssssssssssss ssssssssssslkd ,clk slkdcl ksdmlckmslk dcmls mdlckmsl kdmclkmsdlkcml sdkmclksdm',
+            originalText: '',
 
             stats: [
                 {
                     title: 'Скорость',
                     value: '0зн/м',
-                    maxValue: '0',
+                    maxValue: '0зн/м',
                 },
 
                 {
                     title: 'Точность',
                     value: '100%',
-                    maxValue: '0',
+                    maxValue: '0%',
                 }
             ],
 
             enteredValue: 0,
+            timer: 0,
 
             pieceFullText: 0,
+
+            speedInterval: null,
+            roundInterval: null,
         }
     },
 
-    async mounted() {
+    mounted() {
         let lang;
 
         document.addEventListener('keydown', (event) => {
@@ -84,6 +97,7 @@ export default {
             if (symbol.length > 1) return;
 
             lang = this.defineLanguage(event.key);
+
 
             if (lang) {
                 if (lang !== this.lang) {
@@ -121,6 +135,14 @@ export default {
                 this.speedometer();
             }
         },
+
+        againMark() {
+            this.updateOriginalText(this.lang);
+        },
+
+        numberOfSentences() {
+            this.updateOriginalText(this.lang);
+        }
     },
 
     methods: {
@@ -132,6 +154,10 @@ export default {
                 this.selected = this.originalText[0];
                 this.originalText = this.originalText.slice(1);
 
+                if (this.originalText.length === 0 && this.selected === undefined) {
+                    this.preCompletedGame();
+                }
+
                 this.enteredValue += 1;
             } else {
                 if(this.errorInput === true) return;
@@ -141,24 +167,39 @@ export default {
             }
         },
 
-        async updateOriginalText(lang) {
-            let loremTextObj = new LoremText(lang);
-            this.originalText = await loremTextObj.getLoremText(4); 
-
-            this.pieceFullText = (100 / this.originalText.length).toFixed(1);
-            
+        newLetterSlice() {
             this.completed = '';
             this.selected = this.originalText[0];
             this.originalText = this.originalText.slice(1);
         },
 
+        correctAmount(num, lang) {
+            if (lang === 'eng') {
+                return num * 2;
+            }
+
+            return num;
+        },
+
+        async updateOriginalText(lang) {
+            let loremTextObj = new LoremText(lang);
+            this.originalText = await loremTextObj.getLoremText(this.correctAmount(this.numberOfSentences, lang)); 
+
+            this.pieceFullText = (100 / this.originalText.length).toFixed(1);
+            
+            this.newLetterSlice();
+        },
+
         defineLanguage(value) {
             if (/[а-я]/i.test(value)) {
                 return 'rus';
+
             } else if (/[a-z]/i.test(value)) {
                 return 'eng';
+
             }else if(/[\s\d\W]/i.test(value)) {
                 return this.lang;
+
             } else {
                 alert('Приложение не работает с вашей раскладкой. Измените на русский или английский язык.');
                 return false;
@@ -168,17 +209,18 @@ export default {
 
         speedometer() {
             let piece = 1 / 60;
-            let timer = 0;
 
             function speed() {
-                timer += piece;
-                this.stats[0].value = Math.floor(this.enteredValue / timer) + 'зн/м';
+                this.timer += piece;
+                this.stats[0].value = Math.floor(this.enteredValue / this.timer) + 'зн/м';
             }
 
-            setInterval(speed.bind(this) , 1000);
-            setInterval(() => {
-                timer = Math.ceil(timer);
-            }, 60000);
+            function roundMin() {
+                this.timer = Math.ceil(this.timer);
+            }
+
+            this.speedInterval = setInterval(speed.bind(this) , 1000);
+            this.roundInterval = setInterval(roundMin, 60000);
         },
 
         accuracyCheck() {
@@ -196,6 +238,80 @@ export default {
             this.stats[1].value = (valueAccuracy - this.pieceFullText).toFixed(1) + '%';
         },
 
+
+        startExercisingAgain() {
+            this.originalText = this.completed + this.selected + this.originalText;
+
+            this.newLetterSlice();
+
+            this.stats[0].value = '0зн/м';
+            this.stats[1].value = '100%';
+            
+            this.enteredValue = 0;
+            this.timer = 0;
+            clearInterval(this.speedInterval);
+            clearInterval(this.roundInterval);
+        },
+
+        
+        preCompletedGame() {
+            let values = {
+                speed: this.stats[0].value.slice(0, this.stats[0].value.length - 4),
+                accuracy: this.stats[1].value.slice(0, this.stats[1].value.length - 1),
+                maxSpeed: this.stats[0].maxValue.slice(0, this.stats[0].maxValue.length - 4),
+                maxAccuracy: this.stats[1].maxValue.slice(0, this.stats[1].maxValue.length - 1),
+            }
+
+            this.completedGame(values);
+        },
+        
+        completedGame(values) {
+            let fullStats = [
+                {
+                    title: this.stats[0].title
+                },
+
+                {
+                    title: this.stats[1].title
+                }
+            ];
+        
+            if (values.speed > values.maxSpeed) {
+                fullStats[0].oldValue = values.maxSpeed;
+                fullStats[0].maxValue = values.speed;
+                fullStats[0].value = values.speed;
+            } else {
+                fullStats[0].oldValue = values.maxSpeed;
+                fullStats[0].maxValue = false;
+                fullStats[0].value = values.speed;
+            }
+
+            if (values.accuracy > values.maxAccuracy) {
+                fullStats[1].oldValue = values.maxAccuracy;
+                fullStats[1].maxValue = values.accuracy;
+                fullStats[1].value = values.accuracy;
+            } else {
+                fullStats[1].oldValue = values.maxAccuracy;
+                fullStats[1].maxValue = false;
+                fullStats[1].value = values.accuracy;
+            }
+
+            this.$emit('completedGame', fullStats);
+
+            this.startExercisingAgain();
+        },
+
+
+        changeMode(mode) {
+            switch(mode) {
+                case 'hard':
+                    this.numberOfSentences = 4;
+                    break;
+                case 'easy': 
+                    this.numberOfSentences = 2;
+                    break;
+            }
+        }
     }
 }
 </script>

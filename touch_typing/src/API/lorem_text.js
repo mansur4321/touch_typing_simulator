@@ -34,14 +34,23 @@ export default class LoremText {
             method: 'GET',
         });
 
+
         if(response.ok) {
             let message = await response.json();
 
             switch(this.lang) {
                 case 'rus':
+                    if (message.text.length > 700) {
+                        return this.getLoremText(length);
+                    }
+
                     return message.text;
                 
                 case 'eng':
+                    if (message[0].length > 700) {
+                        return this.getLoremText(length);
+                    }
+
                     return message[0];
             }
 

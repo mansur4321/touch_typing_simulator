@@ -6,6 +6,7 @@
 @color-dark-blue: rgb(42, 99, 110);
 @color-gray: rgb(100, 100, 100);
 @color-red: rgb(230, 0, 0);
+@color-orange: rgb(241, 112, 0);
 
 * {
     font-family: 'Roboto', sans-serif;
@@ -161,6 +162,92 @@
 
 .mt-left-item {
     margin-top: 40px;
+}
+
+.completed {
+    width: 700px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    border: 2px solid @color-blue;
+    background: @color-white;
+    margin: 0 auto;
+
+    &__title {
+        font-size: 36px;
+        color: @color-blue;
+        font-weight: 500;
+        text-align: center;
+        margin: 10px;
+    }
+
+    &__new-record-wrapp {
+        width: 100%;
+    }
+
+    &__text {
+        font-size: 22px;
+        color: @color-light-blue;
+        & span {
+            color: @color-orange;
+            font-size: 28px;
+            font-weight: 600;
+        }
+    }
+
+    &__new-record-values {
+        width: 100%;
+    }
+}
+
+.new-record {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    margin-top: 15px;
+
+    &__title {
+        font-size: 28px;
+        color: @color-blue;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+
+    &__wrapper {
+        width: 100%;
+    }
+
+    &__value {
+        margin-bottom: 15px;
+        font-size: 20px;
+        color: @color-light-blue;
+
+        & span {
+            font-size: 24px;
+            color: @color-orange;
+            font-weight: 600;
+        }
+    }
+}
+
+.wrapper-complete-component {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    z-index: 2;
+}
+
+
+
+
+._close-component {
+    z-index: -1;
 }
 
 ._btn-active {
